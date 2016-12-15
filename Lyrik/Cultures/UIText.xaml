@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="Confirm">确定</sys:String>
+    <sys:String x:Key="Start">开始</sys:String>
+
+    <sys:String x:Key="confirmExit">真的要退出吗？</sys:String>
+    <sys:String x:Key="confirmExitCaption">退出</sys:String>
+
+</ResourceDictionary>

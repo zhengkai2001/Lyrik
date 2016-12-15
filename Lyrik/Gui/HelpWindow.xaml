@@ -1,0 +1,21 @@
+﻿<Window x:Class="Lyrik.Gui.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="使用说明" Height="325" Width="360" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Margin="10, 10, 10, 10" TextWrapping="Wrap" FontSize="13" LineHeight="21">
+            <Run Foreground="Orange">●</Run> 本软件会将指定目录下的所有音乐文件自动添加歌词，添加后的歌词可以在 iPhone 和 iPad 的自带音乐 app 中显示。现在你有更充分的理由继续使用 iOS 自带的音乐 app 了！<LineBreak/>
+            <Run Foreground="Orange">●</Run> 搜索歌词时使用的是歌曲标签中的信息，请确保歌曲标签包含正确的歌名、艺术家名信息。<LineBreak/>
+            <Run Foreground="Orange">●</Run> 目前是从百度音乐的网页上抓取歌词，因此，如果将来百度歌词网页结构发生了变化，本软件就可能会失效。届时请寻找本软件的新版本下载。<LineBreak/>
+            <Run Foreground="Orange">●</Run> 目前仅支持 .mp3 和 .m4a 文件。<LineBreak/>
+        </TextBlock>
+        <DockPanel Grid.Row="1">
+            <Button Click="close" Height="30" Width="120">确定</Button>
+        </DockPanel>
+    </Grid>
+</Window>
