@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Lyrik.Utilities
 {
-    class Text
+    internal class Text
     {
         private Text()
         {
@@ -11,16 +11,16 @@ namespace Lyrik.Utilities
 
         //0.0.3新增
         //修正了某些标签中文读取为乱码的问题
-        public static string processString(string str)
+        public static string ProcessString(string str)
         {
-            byte[] buffer = Encoding.Unicode.GetBytes(str);
+            var buffer = Encoding.Unicode.GetBytes(str);
 
             if (buffer.Length % 2 == 1)
             {
                 return str;
             }
 
-            for (int i = 1; i < buffer.Length; i += 2)
+            for (var i = 1; i < buffer.Length; i += 2)
             {
                 if (buffer[i] != 0)
                 {
@@ -28,58 +28,56 @@ namespace Lyrik.Utilities
                 }
             }
 
-            byte[] result = new byte[1];
+            var result = new byte[1];
 
             for (int i = 0, n = 0; i != buffer.Length; ++i)
             {
-                if (buffer[i] != 0)
+                if (buffer[i] == 0)
                 {
-                    Array.Resize<byte>(ref result, n + 1);
-                    result[n] = buffer[i];
-                    ++n;
+                    continue;
                 }
+
+                Array.Resize(ref result, n + 1);
+                result[n] = buffer[i];
+                ++n;
             }
 
-            string res = Encoding.Default.GetString(result);
+            var res = Encoding.Default.GetString(result);
             return res;
         }
 
-        public static string deleteSectionBetween(string line, char left, char right)
+        public static string DeleteSectionBetween(string line, char left, char right)
         {
             while (true)
             {
-                int begin = line.IndexOf(left);
-                int end = line.LastIndexOf(right);
+                var begin = line.IndexOf(left);
+                var end = line.LastIndexOf(right);
 
                 if (begin == -1 || end == -1)
                 {
                     break;
                 }
-                else if (begin < end)
+
+                if (begin >= end)
                 {
-                    if (begin == 0)
+                    continue;
+                }
+
+                if (begin == 0)
+                {
+                    line = end == line.Length - 1 ? "" : line.Substring(end + 1);
+                }
+                else
+                {
+                    if (end == line.Length - 1)
                     {
-                        if (end == line.Length - 1)
-                        {
-                            line = "";
-                        }
-                        else
-                        {
-                            line = line.Substring(end + 1);
-                        }
+                        line = line.Substring(0, begin);
                     }
                     else
                     {
-                        if (end == line.Length - 1)
-                        {
-                            line = line.Substring(0, begin);
-                        }
-                        else
-                        {
-                            String part1 = line.Substring(0, begin);
-                            String part2 = line.Substring(end + 1);
-                            line = part1 + part2;
-                        }
+                        var part1 = line.Substring(0, begin);
+                        var part2 = line.Substring(end + 1);
+                        line = part1 + part2;
                     }
                 }
             }

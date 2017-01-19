@@ -1,11 +1,9 @@
 ﻿using Lyrik.Lyrics;
 using System;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Resources;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using WPFCustomMessageBox;
 
 namespace Lyrik.Gui
@@ -15,41 +13,38 @@ namespace Lyrik.Gui
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window, IDisposable
+    public partial class MainWindow : IDisposable
     {
-        private const string updateURL = @"http://pan.baidu.com/s/1dD1slCt";
-        private const string songDirFile = @".\song_dir.ini";
-        private const string defaultSongDir = @"D:\Music";
+        private const string UpdateUrl = @"http://pan.baidu.com/s/1dD1slCt";
+        private const string SongDirFile = @".\song_dir.ini";
+        private const string DefaultSongDir = @"D:\Music";
 
-        private const string statusLabelReady = "就绪";
-        private const string statusLabelAdding = "添加歌词中...";
-        private const string statusLabelPause = "已暂停";
+        private const string StatusLabelReady = "就绪";
+        private const string StatusLabelAdding = "添加歌词中...";
+        private const string StatusLabelPause = "已暂停";
 
-        private LyricAdder lyricAdder;
-        private Thread thread;
-        private TaskCompleted taskCompleted;
-
-        private ResourceManager stringManager;
+        private readonly LyricAdder _lyricAdder;
+        private Thread _thread;
+        private readonly TaskCompleted _taskCompleted;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            initComponents();
+            InitComponents();
 
-            songDirTextBox.Text = getSongDir();
+            songDirTextBox.Text = GetSongDir();
             addLyricForAllRadioButton.IsChecked = true;
 
-            lyricAdder = new LyricAdder();
-            lyricAdder.setStatusTextBox(statusTextBox);
-            lyricAdder.setStatusLabel(statusLabel, statusLabelAdding);
+            _lyricAdder = new LyricAdder();
+            _lyricAdder.SetStatusTextBox(statusTextBox);
+            _lyricAdder.SetStatusLabel(statusLabel, StatusLabelAdding);
 
-            taskCompleted = new TaskCompleted(initComponents);
-
-            stringManager = new ResourceManager("Lyrik.Resources.StringResource", Assembly.GetExecutingAssembly());
+            //_taskCompleted = new TaskCompleted(InitComponents);
+            _taskCompleted = InitComponents;
         }
 
-        private void initComponents()
+        private void InitComponents()
         {
             addLyricForAllRadioButton.IsEnabled = true;
             addLyricForEmptyRadioButton.IsEnabled = true;
@@ -57,43 +52,66 @@ namespace Lyrik.Gui
             startButton.IsEnabled = true;
             pauseResumeButton.Content = "暂停";
             pauseResumeButton.IsEnabled = false;
-            pauseResumeButton.Click -= pause;
-            pauseResumeButton.Click -= resume;
-            pauseResumeButton.Click += pause;
+            pauseResumeButton.Click -= Pause;
+            pauseResumeButton.Click -= Resume;
+            pauseResumeButton.Click += Pause;
             haltButton.IsEnabled = false;
 
-            statusLabel.Content = statusLabelReady;
+            statusLabel.Content = StatusLabelReady;
         }
 
-        private static string getSongDir()
+        private void SwitchLanguage(object sender, RoutedEventArgs e)
         {
-            string songDirStr = null;
-            FileInfo fi = new FileInfo(songDirFile);
-            if (fi.Exists)
+            var menuItem = sender as MenuItem;
+            if (menuItem == null)
             {
-                StreamReader sr = new StreamReader(fi.OpenRead());
-                songDirStr = sr.ReadLine();
-                sr.Close();
+                return;
             }
 
-            return String.IsNullOrWhiteSpace(songDirStr) ? defaultSongDir : songDirStr;
+            string culture;
+            switch (menuItem.Name)
+            {
+                case "Language_SimplifiedChinese":
+                    culture = "zh-CN";
+                    break;
+                //case "Language_English":
+                default:
+                    culture = "en-US";
+                    break;
+            }
+            App.SetCulture(culture);
         }
 
-        private void browserSongDir(object sender, EventArgs e)
+        private static string GetSongDir()
         {
-            string browserSongDirCaption = stringManager.GetString("browserSongDirCaption", CultureInfo.CurrentUICulture);
-            string result = DirectoryBrowser.browser(songDirTextBox.Text, browserSongDirCaption);
+            var fi = new FileInfo(SongDirFile);
+            if (fi.Exists)
+            {
+                return DefaultSongDir;
+            }
+
+            var sr = new StreamReader(fi.OpenRead());
+            var songDirStr = sr.ReadLine();
+            sr.Close();
+
+            return string.IsNullOrWhiteSpace(songDirStr) ? DefaultSongDir : songDirStr;
+        }
+
+        private void BrowserSongDir(object sender, EventArgs e)
+        {
+            var browserSongDirCaption = App.CultureDictionary["BrowserSongDirCaption"].ToString();
+            var result = DirectoryBrowser.Browser(songDirTextBox.Text, browserSongDirCaption);
             if (!string.IsNullOrEmpty(result))
             {
                 songDirTextBox.Text = result;
             }
         }
 
-        private void addLyric(object sender, EventArgs e)
+        private void AddLyric(object sender, EventArgs e)
         {
             statusTextBox.Clear();
 
-            string songDir = songDirTextBox.Text;
+            var songDir = songDirTextBox.Text;
             if (!new DirectoryInfo(songDir).Exists)
             {
                 statusTextBox.AppendText("指定的音乐文件目录不存在，请修改~\n");
@@ -106,8 +124,8 @@ namespace Lyrik.Gui
             Stream stream = null;
             try
             {
-                stream = new FileStream(songDirFile, FileMode.Create, FileAccess.Write);
-                using (StreamWriter writer = new StreamWriter(stream))
+                stream = new FileStream(SongDirFile, FileMode.Create, FileAccess.Write);
+                using (var writer = new StreamWriter(stream))
                 {
                     stream = null;
                     writer.WriteLine(songDir);
@@ -115,100 +133,102 @@ namespace Lyrik.Gui
             }
             finally
             {
-                if (stream != null)
-                    stream.Dispose();
+                stream?.Dispose();
             }
 
-            if (thread == null ||
-                thread.ThreadState == ThreadState.Stopped)
-            {
-                startButton.IsEnabled = false;
-                pauseResumeButton.Content = "暂停";
-                pauseResumeButton.IsEnabled = true;
-                haltButton.IsEnabled = true;
-
-                addLyricForAllRadioButton.IsEnabled = false;
-                addLyricForEmptyRadioButton.IsEnabled = false;
-
-                statusLabel.Content = statusLabelAdding;
-
-                lyricAdder.setSongDir(songDir);
-                lyricAdder.setAddLyricRules(addLyricForEmptyRadioButton.IsChecked ?? false);
-
-                thread = new Thread(new ThreadStart(addLyric));
-                thread.Start();
-            }
-        }
-
-        private void addLyric()
-        {
-            lyricAdder.addLyric();
-
-            this.Dispatcher.BeginInvoke(taskCompleted);
-        }
-
-        private void pause(object sender, EventArgs e)
-        {
-            lyricAdder.pause();
-
-            statusLabel.Content = statusLabelPause;
-
-            pauseResumeButton.Content = "继续";
-            pauseResumeButton.Click -= pause;
-            pauseResumeButton.Click += resume;
-        }
-
-        private void resume(object sender, EventArgs e)
-        {
-            lyricAdder.resume();
-
-            statusLabel.Content = statusLabelAdding;
-
-            pauseResumeButton.Content = "暂停";
-            pauseResumeButton.Click -= resume;
-            pauseResumeButton.Click += pause;
-        }
-
-        private void update(object sender, EventArgs e)
-        {
-            update();
-        }
-
-        private static void update()
-        {
-            System.Diagnostics.Process.Start(updateURL);
-        }
-
-        private void haltClick(object sender, EventArgs e)
-        {
-            halt();
-            initComponents();
-        }
-
-        private void halt()
-        {
-            if (thread == null)
+            if (_thread != null && _thread.ThreadState != ThreadState.Stopped)
             {
                 return;
             }
-            if (thread.ThreadState == ThreadState.Running
-                        || thread.ThreadState == ThreadState.WaitSleepJoin)
-            {
-                lyricAdder.halt();
-                thread.Join();
-                addLyricForAllRadioButton.IsEnabled = true;
-                addLyricForEmptyRadioButton.IsEnabled = true;
-            }
+
+            startButton.IsEnabled = false;
+            pauseResumeButton.Content = "暂停";
+            pauseResumeButton.IsEnabled = true;
+            haltButton.IsEnabled = true;
+
+            addLyricForAllRadioButton.IsEnabled = false;
+            addLyricForEmptyRadioButton.IsEnabled = false;
+
+            statusLabel.Content = StatusLabelAdding;
+
+            _lyricAdder.SetSongDir(songDir);
+            _lyricAdder.SetAddLyricRules(addLyricForEmptyRadioButton.IsChecked ?? false);
+
+            _thread = new Thread(AddLyric);
+            _thread.Start();
         }
 
-        private bool exitConfirmed = false;
+        private void AddLyric()
+        {
+            _lyricAdder.AddLyric();
+
+            Dispatcher.BeginInvoke(_taskCompleted);
+        }
+
+        private void Pause(object sender, EventArgs e)
+        {
+            _lyricAdder.Pause();
+
+            statusLabel.Content = StatusLabelPause;
+
+            pauseResumeButton.Content = "继续";
+            pauseResumeButton.Click -= Pause;
+            pauseResumeButton.Click += Resume;
+        }
+
+        private void Resume(object sender, EventArgs e)
+        {
+            _lyricAdder.Resume();
+
+            statusLabel.Content = StatusLabelAdding;
+
+            pauseResumeButton.Content = "暂停";
+            pauseResumeButton.Click -= Resume;
+            pauseResumeButton.Click += Pause;
+        }
+
+        private void Update(object sender, EventArgs e)
+        {
+            Update();
+        }
+
+        private static void Update()
+        {
+            System.Diagnostics.Process.Start(UpdateUrl);
+        }
+
+        private void HaltClick(object sender, EventArgs e)
+        {
+            Halt();
+            InitComponents();
+        }
+
+        private void Halt()
+        {
+            if (_thread == null)
+            {
+                return;
+            }
+            if (_thread.ThreadState != ThreadState.Running
+                && _thread.ThreadState != ThreadState.WaitSleepJoin)
+            {
+                return;
+            }
+
+            _lyricAdder.Halt();
+            _thread.Join();
+            addLyricForAllRadioButton.IsEnabled = true;
+            addLyricForEmptyRadioButton.IsEnabled = true;
+        }
+
+        private bool _exitConfirmed;
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            if (confirmExit())
+            if (ConfirmExit())
             {
                 base.OnClosing(e);
-                exit();
+                Exit();
             }
             else
             {
@@ -219,78 +239,76 @@ namespace Lyrik.Gui
             }
         }
 
-        private bool confirmExit()
+        private bool ConfirmExit()
         {
-            if (exitConfirmed)
+            if (_exitConfirmed)
             {
                 return true;
             }
 
-            string confirmExitCaption = stringManager.GetString("confirmExitCaption", CultureInfo.CurrentUICulture);
-            string confirmExit = stringManager.GetString("confirmExit", CultureInfo.CurrentUICulture);
-            if (CustomMessageBox.Show(confirmExitCaption, confirmExit, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                exitConfirmed = true;
-                return true;
-            }
-            else
+            var confirmExitCaption = App.CultureDictionary["ConfirmExitCaption"].ToString();
+            var confirmExit = App.CultureDictionary["ConfirmExit"].ToString();
+
+            if (CustomMessageBox.Show(confirmExit, confirmExitCaption, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
             {
                 return false;
             }
+            _exitConfirmed = true;
+            return true;
         }
 
-        private void exitClick(object sender, RoutedEventArgs e)
+        private void ExitClick(object sender, RoutedEventArgs e)
         {
-            if (confirmExit())
+            if (ConfirmExit())
             {
-                exit();
+                Exit();
             }
         }
 
-        private void exit()
+        private void Exit()
         {
-            halt();
+            Halt();
             Application.Current.Shutdown();
 
             //强制结束线程，不好
-            //thread.Abort();
+            //_thread.Abort();
 
             //强制结束程序，不好
             //Environment.Exit(0);
         }
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        private bool disposed = false;
+        private bool _disposed;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (_disposed)
             {
                 return;
             }
             if (disposing)
             {
-                lyricAdder.Dispose();
+                _lyricAdder.Dispose();
             }
 
-            disposed = true;
+            _disposed = true;
         }
 
-        private void showHelpWindow(object sender, RoutedEventArgs e)
+        private void ShowHelpWindow(object sender, RoutedEventArgs e)
         {
             new HelpWindow().ShowDialog();
         }
 
-        private void showAboutWindow(object sender, RoutedEventArgs e)
+        private void ShowAboutWindow(object sender, RoutedEventArgs e)
         {
             new AboutWindow().ShowDialog();
         }
 
-        private void showDonateWindow(object sender, RoutedEventArgs e)
+        private void ShowDonateWindow(object sender, RoutedEventArgs e)
         {
             new DonateWindow().ShowDialog();
         }

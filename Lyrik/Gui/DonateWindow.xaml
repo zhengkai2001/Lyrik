@@ -19,7 +19,7 @@
         <Image Grid.Row="1" Source="pack://application:,,,/Images/wechat.png" />
         
         <DockPanel Grid.Row="2">
-            <Button Click="close" Height="30" Width="120">确定</Button>
+            <Button Click="Close" Height="30" Width="120">确定</Button>
         </DockPanel>
     </Grid>
 </Window>

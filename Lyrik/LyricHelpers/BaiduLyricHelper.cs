@@ -3,34 +3,30 @@ using Lyrik.Lyrics;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Lyrik.LyricSites
+namespace Lyrik.LyricHelpers
 {
-    class BaiduLyricHelper : LyricHelper
+    internal class BaiduLyricHelper : LyricHelper
     {
-        private const string baseUrl_search = @"http://music.baidu.com/search/lrc?key=";
-        private const string baseUrl_lrc = @"http://music.baidu.com";
-
-        public BaiduLyricHelper()
+        private const string BaseUrlSearch = @"http://music.baidu.com/search/lrc?key=";
+        private const string BaseUrlLyric = @"http://music.baidu.com";
+        
+        protected override Lyric GetLyricFromSite(string request)
         {
+            var requestUrl = BaseUrlSearch + request;
+            var htmlText = GetHtmlString(requestUrl);
+
+            return string.IsNullOrEmpty(htmlText) ? null : ExtractLyric(htmlText);
         }
 
-        protected override Lyric getLyricFromSite(string request)
-        {
-            string requestUrl = baseUrl_search + request;
-            string htmlText = getHtmlString(requestUrl);
-
-            return string.IsNullOrEmpty(htmlText) ? null : extractLyric(htmlText);
-        }
-
-        private Lyric extractLyric(string htmlText)
+        private Lyric ExtractLyric(string htmlText)
         {
             try
             {
-                HtmlDocument doc = new HtmlDocument();
+                var doc = new HtmlDocument();
                 doc.LoadHtml(htmlText);
 
-                HtmlNodeCollection songNodes = doc.DocumentNode.SelectNodes("//li[@class='clearfix bb']");
-                foreach (HtmlNode songNode in songNodes)
+                var songNodes = doc.DocumentNode.SelectNodes("//li[@class='clearfix bb']");
+                foreach (var songNode in songNodes)
                 {
                     //从网页中提取出标题和表演者
                     //HtmlNode titleNode = songNode.SelectSingleNode("//span[@class='song-title']/a");
@@ -46,16 +42,16 @@ namespace Lyrik.LyricSites
                     //HtmlNodeCollection lrcNodes = songNode.SelectNodes("//span[@class='lyric-action'][contains(a, \"下载\")]/a");
 
                     //直接下载搜索结果中的第一份歌词
-                    HtmlNode lrcNode = songNode.SelectSingleNode("//span[@class='lyric-action']/a[contains(@class, \"down-lrc-btn\")]");
-                    string lrcAddressRaw = lrcNode.GetAttributeValue("class", "");
-                    int openingBrace = lrcAddressRaw.IndexOf('{');
-                    int closingBrace = lrcAddressRaw.LastIndexOf('}');
-                    string hrefJson = lrcAddressRaw.Substring(openingBrace, closingBrace + 1 - openingBrace);
-                    JObject jo = JObject.Parse(hrefJson);
-                    string href = jo.GetValue("href", StringComparison.CurrentCultureIgnoreCase).ToString();
-                    string lrcAddress = baseUrl_lrc + href;
+                    var lrcNode = songNode.SelectSingleNode("//span[@class='lyric-action']/a[contains(@class, \"down-lrc-btn\")]");
+                    var lrcAddressRaw = lrcNode.GetAttributeValue("class", "");
+                    var openingBrace = lrcAddressRaw.IndexOf('{');
+                    var closingBrace = lrcAddressRaw.LastIndexOf('}');
+                    var hrefJson = lrcAddressRaw.Substring(openingBrace, closingBrace + 1 - openingBrace);
+                    var jo = JObject.Parse(hrefJson);
+                    var href = jo.GetValue("href", StringComparison.CurrentCultureIgnoreCase).ToString();
+                    var lrcAddress = BaseUrlLyric + href;
 
-                    return Lyric.getLyricFromLRC(getHtmlString(lrcAddress)); ;
+                    return Lyric.GetLyricFromLrc(GetHtmlString(lrcAddress));
                     //}
                 }
             }

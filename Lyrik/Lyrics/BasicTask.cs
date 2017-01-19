@@ -3,49 +3,49 @@ using System.Threading;
 
 namespace Lyrik.Lyrics
 {
-    class BasicTask : IDisposable
+    internal class BasicTask : IDisposable
     {
         // 用来取消任务
-        private CancellationTokenSource cts;
+        private CancellationTokenSource _cts;
         // 用来暂停/继续任务
-        private ManualResetEventSlim mres;
+        private ManualResetEventSlim _mres;
 
-        protected void taskBegin()
+        protected void TaskBegin()
         {
-            cts = new CancellationTokenSource();
-            mres = new ManualResetEventSlim(true);
+            _cts = new CancellationTokenSource();
+            _mres = new ManualResetEventSlim(true);
         }
 
-        protected void taskProceed()
+        protected void TaskProceed()
         {
-            mres.Wait(cts.Token);
+            _mres.Wait(_cts.Token);
         }
 
-        public void pause()
+        public void Pause()
         {
-            if (mres.IsSet)
+            if (_mres.IsSet)
             {
-                mres.Reset();
+                _mres.Reset();
             }
         }
 
-        public void resume()
+        public void Resume()
         {
-            if (!mres.IsSet)
+            if (!_mres.IsSet)
             {
-                mres.Set();
+                _mres.Set();
             }
         }
 
-        public void halt()
+        public void Halt()
         {
-            cts.Cancel();
+            _cts.Cancel();
         }
 
         public void Dispose()
         {
-            cts.Dispose();
-            mres.Dispose();
+            _cts.Dispose();
+            _mres.Dispose();
         }
     }
 }

@@ -59,23 +59,5 @@ namespace Lyrik.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   查找类似 退出 的本地化字符串。
-        /// </summary>
-        internal static string confirmExit {
-            get {
-                return ResourceManager.GetString("confirmExit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 真的要退出吗？ 的本地化字符串。
-        /// </summary>
-        internal static string confirmExitCaption {
-            get {
-                return ResourceManager.GetString("confirmExitCaption", resourceCulture);
-            }
-        }
     }
 }

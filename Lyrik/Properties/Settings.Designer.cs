@@ -25,13 +25,13 @@ namespace Lyrik.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("zh-CN")]
-        public global::System.Globalization.CultureInfo DefaultCulture {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Culture {
             get {
-                return ((global::System.Globalization.CultureInfo)(this["DefaultCulture"]));
+                return ((string)(this["Culture"]));
             }
             set {
-                this["DefaultCulture"] = value;
+                this["Culture"] = value;
             }
         }
     }

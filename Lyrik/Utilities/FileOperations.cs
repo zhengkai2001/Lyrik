@@ -3,39 +3,41 @@ using System.IO;
 
 namespace Lyrik.Utilities
 {
-    public sealed class FileOperations
+    public static class FileOperations
     {
-        private FileOperations() { }
-
         public static IList<FileInfo> Travel(string dir, string[] supportedFileTypes)
         {
             IList<FileInfo> fileList = new List<FileInfo>();
 
-            DirectoryInfo dirDI = new DirectoryInfo(dir);
-            if (dirDI.Exists)
+            var dirDi = new DirectoryInfo(dir);
+            if (!dirDi.Exists)
             {
-                Queue<DirectoryInfo> dirQueue = new Queue<DirectoryInfo>();
-                dirQueue.Enqueue(dirDI);
+                return fileList;
+            }
 
-                while (dirQueue.Count != 0)
+            var dirQueue = new Queue<DirectoryInfo>();
+            dirQueue.Enqueue(dirDi);
+
+            while (dirQueue.Count != 0)
+            {
+                var di = dirQueue.Dequeue();
+
+                foreach (var d in di.GetDirectories())
                 {
-                    DirectoryInfo di = dirQueue.Dequeue();
-
-                    foreach (DirectoryInfo d in di.GetDirectories())
+                    dirQueue.Enqueue(d);
+                }
+                foreach (var f in di.GetFiles())
+                {
+                    if (supportedFileTypes == null)
                     {
-                        dirQueue.Enqueue(d);
+                        continue;
                     }
-                    foreach (FileInfo f in di.GetFiles())
+
+                    foreach (var supportedFileType in supportedFileTypes)
                     {
-                        if(supportedFileTypes!=null)
+                        if (f.Extension.ToUpperInvariant().Equals(supportedFileType))
                         {
-                            foreach (string supportedFileType in supportedFileTypes)
-                            {
-                                if (f.Extension.ToUpperInvariant().Equals(supportedFileType))
-                                {
-                                    fileList.Add(f);
-                                }
-                            }
+                            fileList.Add(f);
                         }
                     }
                 }
@@ -58,14 +60,13 @@ namespace Lyrik.Utilities
             {
                 //the file is unavailable because it is:
                 //still being written to
-                //or being processed by another thread
+                //or being processed by another _thread
                 //or does not exist (has already been processed)
                 return true;
             }
             finally
             {
-                if (stream != null)
-                    stream.Close();
+                stream?.Close();
             }
 
             //file is not locked

@@ -2,26 +2,27 @@
 using Lyrik.Lyrics;
 using Lyrik.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Lyrik.LyricSites
+namespace Lyrik.LyricHelpers
 {
-    abstract class LyricHelper
+    internal abstract class LyricHelper
     {
-        private HttpClient http;
+        private readonly HttpClient _http;
 
         protected LyricHelper()
         {
-            http = new HttpClient();
-            http.Request.Accept = HttpContentTypes.TextHtml;
+            _http = new HttpClient();
+            _http.Request.Accept = HttpContentTypes.TextHtml;
         }
 
-        protected string getHtmlString(string url)
+        protected string GetHtmlString(string url)
         {
-            HttpResponse response = http.Get(url);
+            var response = _http.Get(url);
             return response.RawText;
         }
 
-        private static void addTitle2Attempts(List<string> requestAttempts, string title, string performer)
+        private static void AddTitle2Attempts(ICollection<string> requestAttempts, string title, string performer)
         {
             if (!string.IsNullOrEmpty(performer))
             {
@@ -31,41 +32,39 @@ namespace Lyrik.LyricSites
             requestAttempts.Add(title);
         }
 
-        public Lyric getLyric(string title, string performer)
+        public Lyric GetLyric(string title, string performer)
         {
-            List<string> requestAttempts = new List<string>();
-            
+            var requestAttempts = new List<string>();
+
             //用于处理形如“Kwang Chiu (Cantonese Version) [Cantonese Version]”的歌名
             //将所有括号内的内容删去
-            string simplifiedTitle = Text.deleteSectionBetween(title, '(', ')');
-            simplifiedTitle = Text.deleteSectionBetween(simplifiedTitle, '（', '）');
-            simplifiedTitle = Text.deleteSectionBetween(simplifiedTitle, '[', ']');
-            simplifiedTitle = Text.deleteSectionBetween(simplifiedTitle, '【', '】');
+            var simplifiedTitle = Text.DeleteSectionBetween(title, '(', ')');
+            simplifiedTitle = Text.DeleteSectionBetween(simplifiedTitle, '（', '）');
+            simplifiedTitle = Text.DeleteSectionBetween(simplifiedTitle, '[', ']');
+            simplifiedTitle = Text.DeleteSectionBetween(simplifiedTitle, '【', '】');
             simplifiedTitle = simplifiedTitle.Trim();
 
             if (!requestAttempts.Contains(simplifiedTitle))
             {
-                addTitle2Attempts(requestAttempts, simplifiedTitle, performer);
+                AddTitle2Attempts(requestAttempts, simplifiedTitle, performer);
             }
 
-            addTitle2Attempts(requestAttempts, title, performer);
+            AddTitle2Attempts(requestAttempts, title, performer);
 
-            foreach (string request in requestAttempts)
-            {
-                Lyric lyric = getLyricFromSite(request);
-                if (lyric == null)
-                {
-                    continue;
-                }
-                else
-                {
-                    return lyric;
-                }
-            }
+            //foreach (var request in requestAttempts)
+            //{
+            //    Lyric lyric = GetLyricFromSite(request);
+            //    if (lyric != null)
+            //    {
+            //        return lyric;
+            //    }
+            //}
 
-            return null;
+            // LINQ
+            // 下面一行的作用等同于上面八行
+            return requestAttempts.Select(GetLyricFromSite).FirstOrDefault(lyric => lyric != null);
         }
 
-        protected abstract Lyric getLyricFromSite(string request);
+        protected abstract Lyric GetLyricFromSite(string request);
     }
 }

@@ -15,7 +15,7 @@
             <Run Foreground="Orange">●</Run> 目前仅支持 .mp3 和 .m4a 文件。<LineBreak/>
         </TextBlock>
         <DockPanel Grid.Row="1">
-            <Button Click="close" Height="30" Width="120">确定</Button>
+            <Button Click="Close" Height="30" Width="120">确定</Button>
         </DockPanel>
     </Grid>
 </Window>

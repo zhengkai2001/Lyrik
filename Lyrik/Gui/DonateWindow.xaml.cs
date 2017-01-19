@@ -5,16 +5,16 @@ namespace Lyrik.Gui
     /// <summary>
     /// DonateWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class DonateWindow : Window
+    public partial class DonateWindow
     {
         public DonateWindow()
         {
             InitializeComponent();
         }
 
-        private void close(object sender, RoutedEventArgs e)
+        private void Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

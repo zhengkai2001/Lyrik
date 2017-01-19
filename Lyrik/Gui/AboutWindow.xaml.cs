@@ -5,15 +5,15 @@ namespace Lyrik.Gui
     /// <summary>
     /// AboutWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class AboutWindow : Window
+    public partial class AboutWindow
     {
         public AboutWindow()
         {
             InitializeComponent();
         }
-        private void close(object sender, RoutedEventArgs e)
+        private void Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

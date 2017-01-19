@@ -9,22 +9,27 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="SeaShell">
             <MenuItem Header="功能">
-                <MenuItem Header="去网盘下载最新版本…" Click="update"></MenuItem>
+                <MenuItem Header="Languages">
+                    <MenuItem Header="English" Name="Language_English" Click="SwitchLanguage"/>
+                    <MenuItem Header="简体中文" Name="Language_SimplifiedChinese" Click="SwitchLanguage"/>
+                </MenuItem>
+                
+                <MenuItem Header="去网盘下载最新版本…" Click="Update"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Header="退出" Click="exitClick"></MenuItem>
+                <MenuItem Header="退出" Click="ExitClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="帮助">
-                <MenuItem Header="使用说明" Click="showHelpWindow"></MenuItem>
+                <MenuItem Header="使用说明" Click="ShowHelpWindow"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Header="通过微信扫一扫捐助作者…" Click="showDonateWindow"></MenuItem>
-                <MenuItem Header="关于…" Click="showAboutWindow"></MenuItem>
+                <MenuItem Header="通过微信扫一扫捐助作者…" Click="ShowDonateWindow"></MenuItem>
+                <MenuItem Header="关于…" Click="ShowAboutWindow"></MenuItem>
             </MenuItem>
         </Menu>
         <DockPanel DockPanel.Dock="Top" LastChildFill="True" Margin="4, 0, 4, 4">
             <StackPanel DockPanel.Dock="Top">
                 <Label Margin="-3, 0, 0, 0">请选择音乐文件目录：（该目录下所有支持格式的音乐文件都会被添加歌词）</Label>
                 <DockPanel FlowDirection="RightToLeft" Margin="0, 2, 0, 2">
-                    <Button FlowDirection="LeftToRight" Padding="15, 0, 15, 0" Margin="0, 0, 3, 0" Click="browserSongDir">浏览...</Button>
+                    <Button FlowDirection="LeftToRight" Padding="15, 0, 15, 0" Margin="0, 0, 3, 0" Click="BrowserSongDir">浏览...</Button>
                     <TextBox Name="songDirTextBox" FlowDirection="LeftToRight" TextAlignment="Left" Margin="3, 0, 0, 0"></TextBox>
                 </DockPanel>
             </StackPanel>
@@ -39,9 +44,9 @@
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="0, 0, 3, 0" Name="startButton" Click="addLyric">开始</Button>
+                <Button Grid.Column="0" Margin="0, 0, 3, 0" Name="startButton" Click="AddLyric">开始</Button>
                 <Button Grid.Column="1" Margin="3, 0, 3, 0" Name="pauseResumeButton"></Button>
-                <Button Grid.Column="2" Margin="3, 0, 0, 0" Name="haltButton" Click="haltClick">停止</Button>
+                <Button Grid.Column="2" Margin="3, 0, 0, 0" Name="haltButton" Click="HaltClick">停止</Button>
             </Grid>
             <DockPanel LastChildFill="True" Margin="0, 3, 0, 0">
                 <Label Name="statusLabel" Margin="0, 2, 0, 0" DockPanel.Dock="Bottom"

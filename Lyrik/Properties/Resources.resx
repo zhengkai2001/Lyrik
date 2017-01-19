@@ -117,10 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="confirmExit" xml:space="preserve">
-    <value>退出</value>
-  </data>
-  <data name="confirmExitCaption" xml:space="preserve">
-    <value>真的要退出吗？</value>
-  </data>
 </root>
