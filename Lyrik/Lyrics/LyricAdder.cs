@@ -29,6 +29,7 @@ namespace Lyrik.Lyrics
         {
             _lyricHelpers = new List<LyricHelper>
             {
+                new AzlyricsLyricHelper(),
                 new BaiduLyricHelper()
             };
 
@@ -72,10 +73,12 @@ namespace Lyrik.Lyrics
 
             foreach (var fi in fileList)
             {
+                ++allCount;
+
+                var count = allCount;
                 _statusLabel.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate
                 {
-                    ++allCount;
-                    _statusLabel.Content = _statusLabelAdding + " (" + allCount + "/" + fileList.Count + ")";
+                    _statusLabel.Content = _statusLabelAdding + " (" + count + "/" + fileList.Count + ")";
                 });
 
                 if (FileOperations.IsFileLocked(fi))
@@ -156,6 +159,15 @@ namespace Lyrik.Lyrics
                     {
                         try
                         {
+                            var chineseSong = Text.ContainsChinese(performer) || Text.ContainsChinese(title);
+                            if (chineseSong)
+                            {
+                                if (lyricHelper.Name == LyricHelperName.Azlyrics)
+                                {
+                                    continue;
+                                }
+                            }
+
                             var lyric = lyricHelper.GetLyric(title, performer);
                             if (lyric == null)
                             {

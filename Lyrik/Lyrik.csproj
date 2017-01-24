@@ -137,7 +137,9 @@
     </Compile>
     <Compile Include="Gui\OpenDirectoryDialog.cs" />
     <Compile Include="LyricHelpers\BaiduLyricHelper.cs" />
+    <Compile Include="LyricHelpers\AzlyricsLyricHelper.cs" />
     <Compile Include="LyricHelpers\LyricHelper.cs" />
+    <Compile Include="LyricHelpers\LyricHelperName.cs" />
     <Compile Include="Lyrics\BasicTask.cs" />
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="Utilities\FileOperations.cs" />

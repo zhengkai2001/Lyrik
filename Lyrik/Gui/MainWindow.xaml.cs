@@ -33,12 +33,12 @@ namespace Lyrik.Gui
 
             InitComponents();
 
-            songDirTextBox.Text = GetSongDir();
-            addLyricForAllRadioButton.IsChecked = true;
+            SongDirTextBox.Text = GetSongDir();
+            AddLyricForAllRadioButton.IsChecked = true;
 
             _lyricAdder = new LyricAdder();
-            _lyricAdder.SetStatusTextBox(statusTextBox);
-            _lyricAdder.SetStatusLabel(statusLabel, StatusLabelAdding);
+            _lyricAdder.SetStatusTextBox(StatusTextBox);
+            _lyricAdder.SetStatusLabel(StatusLabel, StatusLabelAdding);
 
             //_taskCompleted = new TaskCompleted(InitComponents);
             _taskCompleted = InitComponents;
@@ -46,18 +46,18 @@ namespace Lyrik.Gui
 
         private void InitComponents()
         {
-            addLyricForAllRadioButton.IsEnabled = true;
-            addLyricForEmptyRadioButton.IsEnabled = true;
+            AddLyricForAllRadioButton.IsEnabled = true;
+            AddLyricForEmptyRadioButton.IsEnabled = true;
 
-            startButton.IsEnabled = true;
-            pauseResumeButton.Content = "暂停";
-            pauseResumeButton.IsEnabled = false;
-            pauseResumeButton.Click -= Pause;
-            pauseResumeButton.Click -= Resume;
-            pauseResumeButton.Click += Pause;
-            haltButton.IsEnabled = false;
+            StartButton.IsEnabled = true;
+            PauseResumeButton.Content = "暂停";
+            PauseResumeButton.IsEnabled = false;
+            PauseResumeButton.Click -= Pause;
+            PauseResumeButton.Click -= Resume;
+            PauseResumeButton.Click += Pause;
+            HaltButton.IsEnabled = false;
 
-            statusLabel.Content = StatusLabelReady;
+            StatusLabel.Content = StatusLabelReady;
         }
 
         private void SwitchLanguage(object sender, RoutedEventArgs e)
@@ -71,10 +71,10 @@ namespace Lyrik.Gui
             string culture;
             switch (menuItem.Name)
             {
-                case "Language_SimplifiedChinese":
+                case "LanguageSimplifiedChinese":
                     culture = "zh-CN";
                     break;
-                //case "Language_English":
+                //case "LanguageEnglish":
                 default:
                     culture = "en-US";
                     break;
@@ -85,7 +85,7 @@ namespace Lyrik.Gui
         private static string GetSongDir()
         {
             var fi = new FileInfo(SongDirFile);
-            if (fi.Exists)
+            if (!fi.Exists)
             {
                 return DefaultSongDir;
             }
@@ -100,21 +100,21 @@ namespace Lyrik.Gui
         private void BrowserSongDir(object sender, EventArgs e)
         {
             var browserSongDirCaption = App.CultureDictionary["BrowserSongDirCaption"].ToString();
-            var result = DirectoryBrowser.Browser(songDirTextBox.Text, browserSongDirCaption);
+            var result = DirectoryBrowser.Browser(SongDirTextBox.Text, browserSongDirCaption);
             if (!string.IsNullOrEmpty(result))
             {
-                songDirTextBox.Text = result;
+                SongDirTextBox.Text = result;
             }
         }
 
         private void AddLyric(object sender, EventArgs e)
         {
-            statusTextBox.Clear();
+            StatusTextBox.Clear();
 
-            var songDir = songDirTextBox.Text;
+            var songDir = SongDirTextBox.Text;
             if (!new DirectoryInfo(songDir).Exists)
             {
-                statusTextBox.AppendText("指定的音乐文件目录不存在，请修改~\n");
+                StatusTextBox.AppendText("指定的音乐文件目录不存在，请修改~\n");
                 return;
             }
 
@@ -141,18 +141,18 @@ namespace Lyrik.Gui
                 return;
             }
 
-            startButton.IsEnabled = false;
-            pauseResumeButton.Content = "暂停";
-            pauseResumeButton.IsEnabled = true;
-            haltButton.IsEnabled = true;
+            StartButton.IsEnabled = false;
+            PauseResumeButton.Content = "暂停";
+            PauseResumeButton.IsEnabled = true;
+            HaltButton.IsEnabled = true;
 
-            addLyricForAllRadioButton.IsEnabled = false;
-            addLyricForEmptyRadioButton.IsEnabled = false;
+            AddLyricForAllRadioButton.IsEnabled = false;
+            AddLyricForEmptyRadioButton.IsEnabled = false;
 
-            statusLabel.Content = StatusLabelAdding;
+            StatusLabel.Content = StatusLabelAdding;
 
             _lyricAdder.SetSongDir(songDir);
-            _lyricAdder.SetAddLyricRules(addLyricForEmptyRadioButton.IsChecked ?? false);
+            _lyricAdder.SetAddLyricRules(AddLyricForEmptyRadioButton.IsChecked ?? false);
 
             _thread = new Thread(AddLyric);
             _thread.Start();
@@ -169,22 +169,22 @@ namespace Lyrik.Gui
         {
             _lyricAdder.Pause();
 
-            statusLabel.Content = StatusLabelPause;
+            StatusLabel.Content = StatusLabelPause;
 
-            pauseResumeButton.Content = "继续";
-            pauseResumeButton.Click -= Pause;
-            pauseResumeButton.Click += Resume;
+            PauseResumeButton.Content = "继续";
+            PauseResumeButton.Click -= Pause;
+            PauseResumeButton.Click += Resume;
         }
 
         private void Resume(object sender, EventArgs e)
         {
             _lyricAdder.Resume();
 
-            statusLabel.Content = StatusLabelAdding;
+            StatusLabel.Content = StatusLabelAdding;
 
-            pauseResumeButton.Content = "暂停";
-            pauseResumeButton.Click -= Resume;
-            pauseResumeButton.Click += Pause;
+            PauseResumeButton.Content = "暂停";
+            PauseResumeButton.Click -= Resume;
+            PauseResumeButton.Click += Pause;
         }
 
         private void Update(object sender, EventArgs e)
@@ -217,8 +217,8 @@ namespace Lyrik.Gui
 
             _lyricAdder.Halt();
             _thread.Join();
-            addLyricForAllRadioButton.IsEnabled = true;
-            addLyricForEmptyRadioButton.IsEnabled = true;
+            AddLyricForAllRadioButton.IsEnabled = true;
+            AddLyricForEmptyRadioButton.IsEnabled = true;
         }
 
         private bool _exitConfirmed;

@@ -8,6 +8,11 @@ namespace Lyrik.LyricHelpers
 {
     internal abstract class LyricHelper
     {
+        public abstract LyricHelperName Name { get; }
+        protected abstract string RequestUrl { get; set; }
+        protected abstract Lyric GetLyric(string request);
+        protected abstract Lyric GetLyric();
+
         private readonly HttpClient _http;
 
         protected LyricHelper()
@@ -22,7 +27,7 @@ namespace Lyrik.LyricHelpers
             return response.RawText;
         }
 
-        private static void AddTitle2Attempts(ICollection<string> requestAttempts, string title, string performer)
+        private static void AddTitleToAttempts(ICollection<string> requestAttempts, string title, string performer)
         {
             if (!string.IsNullOrEmpty(performer))
             {
@@ -46,10 +51,13 @@ namespace Lyrik.LyricHelpers
 
             if (!requestAttempts.Contains(simplifiedTitle))
             {
-                AddTitle2Attempts(requestAttempts, simplifiedTitle, performer);
+                AddTitleToAttempts(requestAttempts, simplifiedTitle, performer);
             }
 
-            AddTitle2Attempts(requestAttempts, title, performer);
+            if (!title.Equals(simplifiedTitle))
+            {
+                AddTitleToAttempts(requestAttempts, title, performer);
+            }
 
             //foreach (var request in requestAttempts)
             //{
@@ -62,9 +70,7 @@ namespace Lyrik.LyricHelpers
 
             // LINQ
             // 下面一行的作用等同于上面八行
-            return requestAttempts.Select(GetLyricFromSite).FirstOrDefault(lyric => lyric != null);
+            return requestAttempts.Select(GetLyric).FirstOrDefault(lyric => lyric != null);
         }
-
-        protected abstract Lyric GetLyricFromSite(string request);
     }
 }

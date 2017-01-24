@@ -9,23 +9,27 @@ namespace Lyrik.LyricHelpers
     {
         private const string BaseUrlSearch = @"http://music.baidu.com/search/lrc?key=";
         private const string BaseUrlLyric = @"http://music.baidu.com";
-        
-        protected override Lyric GetLyricFromSite(string request)
-        {
-            var requestUrl = BaseUrlSearch + request;
-            var htmlText = GetHtmlString(requestUrl);
 
-            return string.IsNullOrEmpty(htmlText) ? null : ExtractLyric(htmlText);
+        public override LyricHelperName Name => LyricHelperName.Baidu;
+
+        protected override string RequestUrl { get; set; }
+
+        protected override Lyric GetLyric(string request)
+        {
+            RequestUrl = BaseUrlSearch + request;
+            return GetLyric();
         }
 
-        private Lyric ExtractLyric(string htmlText)
+        protected override Lyric GetLyric()
         {
             try
             {
                 var doc = new HtmlDocument();
-                doc.LoadHtml(htmlText);
 
+                var lyricPage = GetHtmlString(RequestUrl);
+                doc.LoadHtml(lyricPage);
                 var songNodes = doc.DocumentNode.SelectNodes("//li[@class='clearfix bb']");
+
                 foreach (var songNode in songNodes)
                 {
                     //从网页中提取出标题和表演者
@@ -47,8 +51,8 @@ namespace Lyrik.LyricHelpers
                     var openingBrace = lrcAddressRaw.IndexOf('{');
                     var closingBrace = lrcAddressRaw.LastIndexOf('}');
                     var hrefJson = lrcAddressRaw.Substring(openingBrace, closingBrace + 1 - openingBrace);
-                    var jo = JObject.Parse(hrefJson);
-                    var href = jo.GetValue("href", StringComparison.CurrentCultureIgnoreCase).ToString();
+                    var hrefJsonObject = JObject.Parse(hrefJson);
+                    var href = hrefJsonObject.GetValue("href", StringComparison.CurrentCultureIgnoreCase).ToString();
                     var lrcAddress = BaseUrlLyric + href;
 
                     return Lyric.GetLyricFromLrc(GetHtmlString(lrcAddress));
@@ -59,6 +63,7 @@ namespace Lyrik.LyricHelpers
             {
                 //若解析html失败
             }
+
             return null;
         }
     }

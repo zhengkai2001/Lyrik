@@ -13,9 +13,9 @@ namespace Lyrik.Lyrics
 
         private readonly string _lyricLine;
 
-        public Lyric(string l)
+        public Lyric(string lyricLine)
         {
-            _lyricLine = l;
+            _lyricLine = lyricLine;
         }
 
         public override string ToString()
@@ -43,8 +43,6 @@ namespace Lyrik.Lyrics
             var lyric = lines.Select(DeleteLrcInfo).Select(DeleteRedundantInfo).Aggregate("", (current, temp) => current + (temp + '\n')).Trim();
 
             return new Lyric(lyric);
-
-            
         }
 
         private static string DeleteLrcInfo(string line)

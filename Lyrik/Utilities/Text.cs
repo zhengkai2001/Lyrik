@@ -1,12 +1,25 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Lyrik.Utilities
 {
-    internal class Text
+    internal static class Text
     {
-        private Text()
+        // detect Chinese in string
+        // http://stackoverflow.com/questions/6088241/is-there-a-way-to-check-whether-unicode-text-is-in-a-certain-language
+
+        private static readonly Regex CjkCharRegex = new Regex(@"\p{IsCJKUnifiedIdeographs}");
+
+        public static bool IsChinese(this char c)
         {
+            return CjkCharRegex.IsMatch(c.ToString());
+        }
+
+        public static bool ContainsChinese(string text)
+        {
+            return text.Any(IsChinese);
         }
 
         //0.0.3新增
@@ -44,6 +57,22 @@ namespace Lyrik.Utilities
 
             var res = Encoding.Default.GetString(result);
             return res;
+        }
+
+
+        public static string DeleteSectionBetween(string line, string left, string right)
+        {
+            var leftIndex = line.IndexOf(left, StringComparison.Ordinal);
+            var rightIndex = line.IndexOf(right, StringComparison.Ordinal) + right.Length;
+            if (leftIndex == -1 || rightIndex == -1)
+            {
+                return line;
+            }
+
+            var part1 = line.Substring(0, leftIndex);
+            var part2 = line.Substring(rightIndex, line.Length - rightIndex);
+
+            return part1 + part2;
         }
 
         public static string DeleteSectionBetween(string line, char left, char right)
