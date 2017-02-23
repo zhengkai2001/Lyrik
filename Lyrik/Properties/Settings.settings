@@ -5,5 +5,14 @@
     <Setting Name="Culture" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="CultureFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="MusicDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultMusicDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Music</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

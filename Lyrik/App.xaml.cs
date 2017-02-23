@@ -10,79 +10,70 @@ namespace Lyrik
     /// </summary>
     public partial class App
     {
-        private static Dictionary<string, ResourceDictionary> _cultures;
+        private static Dictionary<string, ResourceDictionary> _cultureDictionaries;
+        private static ResourceDictionary _cultureDictionary;
 
-        public static string Culture { get; set; }
+        private const string DefaultCulture = @"en-US";
         private const string DefaultCultureFile = @"Cultures/UIText.xaml";
-
-        public static ResourceDictionary CultureDictionary;
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            _cultures = new Dictionary<string, ResourceDictionary>();
+            _cultureDictionaries = new Dictionary<string, ResourceDictionary>();
             foreach (var dictionary in Current.Resources.MergedDictionaries)
             {
-                _cultures[dictionary.Source.OriginalString] = dictionary;
+                _cultureDictionaries[dictionary.Source.OriginalString] = dictionary;
             }
 
-            SetDefaultCulture();
+            InitilizeCulture();
         }
 
-        protected override void OnExit(ExitEventArgs e)
+        private static void InitilizeCulture()
         {
-            SaveCulture();
-        }
+            // 1. try the culture in the setting file
+            var culture = Lyrik.Properties.Settings.Default.Culture.Trim();
 
-        private static void SetDefaultCulture()
-        {
-            Culture = Lyrik.Properties.Settings.Default.Culture.Trim();
-
-            if (string.IsNullOrEmpty(Culture))
+            // 2. if failed, try the culture of the user's machine
+            if (string.IsNullOrEmpty(culture))
             {
-                Culture = CultureInfo.CurrentCulture.ToString();
+                culture = CultureInfo.CurrentCulture.ToString();
             }
 
-            if (string.IsNullOrEmpty(Culture))
+            // 3. if failed, try default culture
+            if (string.IsNullOrEmpty(culture))
             {
-                Culture = "en-US";
+                culture = DefaultCulture;
             }
 
-            UpdateCulture();
+            SetCulture(culture);
         }
 
-        private static void SaveCulture()
+        private static void SaveCultureSettings(string culture, string cultureFile)
         {
-            Lyrik.Properties.Settings.Default.Culture = Culture;
+            Lyrik.Properties.Settings.Default.Culture = culture;
+            Lyrik.Properties.Settings.Default.CultureFile = cultureFile;
             Lyrik.Properties.Settings.Default.Save();
         }
 
         public static void SetCulture(string culture)
         {
-            Culture = culture;
-            UpdateCulture();
-        }
-
-        private static void UpdateCulture()
-        {
-            var requestedCultureFile = string.Format(CultureInfo.CurrentCulture, @"Cultures/UIText.{0}.xaml", Culture);
-            if (!SetCultureFile(requestedCultureFile))
+            var cultureFile = string.Format(CultureInfo.CurrentCulture, @"Cultures/UIText.{0}.xaml", culture);
+            if (!_cultureDictionaries.ContainsKey(cultureFile))
             {
-                SetCultureFile(DefaultCultureFile);
-            }
-        }
-
-        private static bool SetCultureFile(string cultureFile)
-        {
-            if (!_cultures.ContainsKey(cultureFile))
-            {
-                return false;
+                culture = DefaultCulture;
+                cultureFile = DefaultCultureFile;
             }
 
-            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(Culture);
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(Culture);
+            SaveCultureSettings(culture, cultureFile);
 
-            CultureDictionary = _cultures[cultureFile];
-            return true;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(culture);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
+
+            _cultureDictionary = _cultureDictionaries[cultureFile];
+        }
+
+        public static string GetLocalizedString(string key)
+        {
+            return _cultureDictionary[key].ToString();
         }
     }
 }

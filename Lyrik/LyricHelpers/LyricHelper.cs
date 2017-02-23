@@ -3,6 +3,7 @@ using Lyrik.Lyrics;
 using Lyrik.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace Lyrik.LyricHelpers
 {
@@ -23,8 +24,15 @@ namespace Lyrik.LyricHelpers
 
         protected string GetHtmlString(string url)
         {
-            var response = _http.Get(url);
-            return response.RawText;
+            try
+            {
+                var response = _http.Get(url);
+                return response.RawText;
+            }
+            catch (WebException)
+            {
+            }
+            return "";
         }
 
         private static void AddTitleToAttempts(ICollection<string> requestAttempts, string title, string performer)

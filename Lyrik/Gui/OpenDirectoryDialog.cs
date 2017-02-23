@@ -6,7 +6,7 @@ namespace Lyrik.Gui
     internal class OpenDirectoryDialog : IDisposable
     {
         private readonly CommonOpenFileDialog _dialog;
-        public string FileName;
+        public string DirName;
 
         public OpenDirectoryDialog(string initDir, string title)
         {
@@ -26,7 +26,7 @@ namespace Lyrik.Gui
                 ShowPlacesList = true
             };
 
-            FileName = initDir;
+            DirName = initDir;
         }
 
         public CommonFileDialogResult ShowDialog()
@@ -34,7 +34,7 @@ namespace Lyrik.Gui
             var cfr = _dialog.ShowDialog();
             if (cfr == CommonFileDialogResult.Ok)
             {
-                FileName = _dialog.FileName;
+                DirName = _dialog.FileName;
             }
             return cfr;
         }

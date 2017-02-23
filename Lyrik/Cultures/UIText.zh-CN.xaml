@@ -2,6 +2,31 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <sys:String x:Key="MusicDirNotExist">指定的音乐文件目录不存在，请修改~</sys:String>
+    
+    <sys:String x:Key="ButtonPause">暂停</sys:String>
+    <sys:String x:Key="ButtonResume">继续</sys:String>
+
+    <sys:String x:Key="RecordStartAdding">开始添加歌词</sys:String>
+    <sys:String x:Key="RecordFileInUse">该文件正在使用中，无法读取，跳过。</sys:String>
+    <sys:String x:Key="RecordAbnormalTag">该文件的标签可能存在问题，无法读取，跳过。</sys:String>
+    <sys:String x:Key="RecordClassicalMusic">这好像是古典音乐，因此跳过！</sys:String>
+    <sys:String x:Key="RecordAlreadyHasLyric">这首歌已经有歌词了，因此跳过！</sys:String>
+    <sys:String x:Key="RecordCannotConnect">未能连接到歌词站点。可能是歌词站点无法访问，也可能是你的网络连接有些问题……</sys:String>
+    <sys:String x:Key="RecordFound">找到了！</sys:String>
+    <sys:String x:Key="RecordNotFound">没找到~</sys:String>
+    <sys:String x:Key="RecordManuallyStopped">已被手动停止</sys:String>
+    <sys:String x:Key="RecordFinished">完成！</sys:String>
+    <sys:String x:Key="RecordToal">本次共处理</sys:String>
+    <sys:String x:Key="RecordAmongTotal">首歌，其中，</sys:String>
+    <sys:String x:Key="RecordSummaryAlready">首原先就已包含歌词；</sys:String>
+    <sys:String x:Key="RecordSummarySuccessful">首被成功添加歌词。</sys:String>
+    <sys:String x:Key="RecordNoInfo">（信息缺失）</sys:String>
+    
+    <sys:String x:Key="StatusLabelReady">就绪</sys:String>
+    <sys:String x:Key="StatusLabelAdding">添加歌词中...</sys:String>
+    <sys:String x:Key="StatusLabelPause">已暂停</sys:String>
+    
     <sys:String x:Key="Confirm">确定</sys:String>
     <sys:String x:Key="Start">开始</sys:String>
 
@@ -9,5 +34,7 @@
     <sys:String x:Key="ConfirmExitCaption">退出</sys:String>
 
     <sys:String x:Key="BrowserSongDirCaption">选择音乐文件目录</sys:String>
+
+    <sys:String x:Key="AboutWindowCaption">关于...</sys:String>
 
 </ResourceDictionary>

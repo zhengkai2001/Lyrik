@@ -2,11 +2,7 @@
 using Lyrik.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Windows.Controls;
-using System.Windows.Threading;
 using TagLib;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace Lyrik.Lyrics
 {
@@ -19,11 +15,7 @@ namespace Lyrik.Lyrics
         private string _songDir;
         private bool _addLyricForEmpty;
 
-        //private string skipString = "=====Lyrik Skip=====";
-
-        private TextBox _statusTextBox;
-        private Label _statusLabel;
-        private string _statusLabelAdding;
+        private static string _statusLabelAdding;
 
         public LyricAdder()
         {
@@ -35,27 +27,18 @@ namespace Lyrik.Lyrics
 
             TagLib.Id3v2.Tag.DefaultEncoding = StringType.UTF8;
             TagLib.Id3v2.Tag.ForceDefaultEncoding = true;
+
+            _statusLabelAdding = App.GetLocalizedString("StatusLabelAdding");
         }
 
-        public void SetStatusTextBox(TextBox statusTextBox2)
+        public void SetSongDir(string songDir)
         {
-            _statusTextBox = statusTextBox2;
+            _songDir = songDir;
         }
 
-        public void SetStatusLabel(Label statusLabel2, string statusLabelAdding2)
+        public void SetAddLyricRules(bool addLyricForEmpty)
         {
-            _statusLabel = statusLabel2;
-            _statusLabelAdding = statusLabelAdding2;
-        }
-
-        public void SetSongDir(string songDir2)
-        {
-            _songDir = songDir2;
-        }
-
-        public void SetAddLyricRules(bool addLyricForEmpty2)
-        {
-            _addLyricForEmpty = addLyricForEmpty2;
+            _addLyricForEmpty = addLyricForEmpty;
         }
 
         public void AddLyric()
@@ -63,7 +46,7 @@ namespace Lyrik.Lyrics
             var isHalted = false;
             TaskBegin();
 
-            AppendStatus("=== 开始添加歌词 ===\n");
+            AppendRecord("=== " + App.GetLocalizedString("RecordStartAdding") + " ===\n");
 
             var foundCount = 0;
             var allCount = 0;
@@ -75,15 +58,11 @@ namespace Lyrik.Lyrics
             {
                 ++allCount;
 
-                var count = allCount;
-                _statusLabel.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate
-                {
-                    _statusLabel.Content = _statusLabelAdding + " (" + count + "/" + fileList.Count + ")";
-                });
+                SetStatus(_statusLabelAdding + " (" + allCount + "/" + fileList.Count + ")");
 
                 if (FileOperations.IsFileLocked(fi))
                 {
-                    AppendStatus(fi.Name + " 该文件正在使用中，无法读取，跳过。\n");
+                    AppendRecord(fi.Name + " " + App.GetLocalizedString("RecordFileInUse") + "\n");
                     continue;
                 }
 
@@ -98,7 +77,7 @@ namespace Lyrik.Lyrics
 
                     if (tag == null)
                     {
-                        AppendStatus(fi.Name + " 该文件的标签可能存在问题，无法读取，跳过。\n");
+                        AppendRecord(fi.Name + " " + App.GetLocalizedString("RecordAbnormalTag") + "\n");
                         continue;
                     }
 
@@ -110,7 +89,7 @@ namespace Lyrik.Lyrics
 
                     //if (abnormalTagText)
                     //{
-                    //    //AppendStatus("abnormal~" + title + " " + performer);
+                    //    //AppendRecord("abnormal~" + title + " " + performer);
 
                     //    //songFile.RemoveTags(TagLib.TagTypes.Id3v1);
 
@@ -125,32 +104,23 @@ namespace Lyrik.Lyrics
                     //    //tag.Clear();
                     //}
 
-                    AppendStatus(title, performer);
+                    AppendRecord(title, performer);
 
                     if (tag.Genres.Length != 0)
                     {
                         var genre = tag.Genres[0];
                         if (genre.Equals("classical", StringComparison.OrdinalIgnoreCase) || genre.Equals("classic", StringComparison.OrdinalIgnoreCase))
                         {
-                            AppendStatus("这好像是古典音乐，因此跳过！\n");
+                            AppendRecord(App.GetLocalizedString("RecordClassicalMusic") + "\n");
                             continue;
                         }
                     }
 
-                    var lyrics = tag.Lyrics;
-
-                    //if (!string.IsNullOrEmpty(lyrics) && lyrics.Contains(skipString))
-                    //{
-                    //    AppendStatus("这首歌的歌词中包含了让Lyriks跳过它的指令~因此跳过！\n");
-                    //    continue;
-                    //}
-
-                    //如果仅为尚未包含歌词的歌曲添加歌词，那么要先检查一下歌词是否为空
-                    //如果不为空，则跳过
-                    if (_addLyricForEmpty && !string.IsNullOrEmpty(lyrics))
+                    // skip songs that already have lyrics
+                    if (_addLyricForEmpty && !string.IsNullOrEmpty(tag.Lyrics))
                     {
                         ++alreadyCount;
-                        AppendStatus("这首歌已经有歌词了，因此跳过！\n");
+                        AppendRecord(App.GetLocalizedString("RecordAlreadyHasLyric") + "\n");
                         continue;
                     }
 
@@ -174,17 +144,17 @@ namespace Lyrik.Lyrics
                                 continue;
                             }
                             tag.Lyrics = lyric.ToString();
-                            //AppendStatus(lyric.ToString());
+                            //AppendRecord(lyric.ToString());
                             found = true;
                             break;
                         }
                         catch (System.Net.WebException)
                         {
-                            AppendStatus("未能连接到歌词站点。你的网络连接似乎有些问题……\n");
+                            AppendRecord(App.GetLocalizedString("RecordCannotConnect") + "\n");
                         }
                     }
 
-                    AppendStatus(found ? "找到了！\n" : "没找到~\n");
+                    AppendRecord(App.GetLocalizedString(found ? "RecordFound" : "RecordNotFound") + "\n");
                     if (found)
                     {
                         ++foundCount;
@@ -197,41 +167,39 @@ namespace Lyrik.Lyrics
                     songFile.Dispose();
                 }
 
-                try
+                if (TaskCanProceed())
                 {
-                    TaskProceed();
+                    continue;
                 }
-                catch (OperationCanceledException)
-                {
-                    isHalted = true;
-                    break;
-                }
+                isHalted = true;
+                break;
             }
 
-            AppendStatus(isHalted ? "=== 已被手动停止 ===\n" : "=== 完成！ ===\n");
-            AppendStatus("=== 本次共处理 " + allCount + " 首歌，其中");
+            AppendRecord(isHalted ? "=== " + App.GetLocalizedString("RecordManuallyStopped") + " ===\n" : "=== " + App.GetLocalizedString("RecordFinished") + " ===\n");
+            AppendRecord("=== " + App.GetLocalizedString("RecordToal") + " " + allCount + " " + App.GetLocalizedString("RecordAmongTotal") + " ");
             if (_addLyricForEmpty)
             {
-                AppendStatus("原先已包含歌词的有 " + alreadyCount + " 首，");
+                AppendRecord(alreadyCount + " " + App.GetLocalizedString("RecordSummaryAlready") + " ");
             }
-            AppendStatus("成功添加歌词的有 " + foundCount + " 首 ===\n");
+            AppendRecord(foundCount + " " + App.GetLocalizedString("RecordSummarySuccessful") + " ===\n");
         }
 
-        private void AppendStatus(string title, string performer)
+        private static void AppendRecord(string title, string performer)
         {
-            var perfromerToAppend = string.IsNullOrEmpty(performer) ? "(信息缺失)" : performer;
-            var titleToAppend = string.IsNullOrEmpty(title) ? "(信息缺失)" : title;
+            var perfromerToAppend = string.IsNullOrEmpty(performer) ? App.GetLocalizedString("RecordNoInfo") : performer;
+            var titleToAppend = string.IsNullOrEmpty(title) ? App.GetLocalizedString("RecordNoInfo") : title;
 
-            AppendStatus(perfromerToAppend + ": " + titleToAppend + "  ...  ");
+            AppendRecord(perfromerToAppend + ": " + titleToAppend + "  ...  ");
         }
 
-        private void AppendStatus(string status)
+        private static void AppendRecord(string record)
         {
-            _statusTextBox.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate
-            {
-                _statusTextBox.AppendText(status);
-                _statusTextBox.ScrollToEnd();
-            });
+            Gui.MainWindow.Window.AppendRecord(record);
+        }
+
+        private static void SetStatus(string status)
+        {
+            Gui.MainWindow.Window.SetStatus(status);
         }
     }
 }

@@ -10,14 +10,14 @@ namespace Lyrik.Gui
 
         public static string Browser(string initialDirectory, string caption)
         {
-            string result = "";
+            var result = "";
 
             //MessageBox.Show(os, "version", MessageBoxButton.OK, MessageBoxImage.Information);
 
             //if run on Windows XP
             if (OperatingSystem.Contains("5.1"))
             {
-                System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
                 try
                 {
                     if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -34,18 +34,17 @@ namespace Lyrik.Gui
             }
             else
             {
-                OpenDirectoryDialog dialog = null;
+                var dialog = new OpenDirectoryDialog(initialDirectory, caption);
                 try
                 {
-                    dialog = new OpenDirectoryDialog(initialDirectory, caption);
                     if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        result = dialog.FileName;
+                        result = dialog.DirName;
                     }
                 }
                 finally
                 {
-                    dialog?.Dispose();
+                    dialog.Dispose();
                 }
             }
 

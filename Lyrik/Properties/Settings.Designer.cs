@@ -34,5 +34,41 @@ namespace Lyrik.Properties {
                 this["Culture"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CultureFile {
+            get {
+                return ((string)(this["CultureFile"]));
+            }
+            set {
+                this["CultureFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MusicDir {
+            get {
+                return ((string)(this["MusicDir"]));
+            }
+            set {
+                this["MusicDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\Music")]
+        public string DefaultMusicDir {
+            get {
+                return ((string)(this["DefaultMusicDir"]));
+            }
+            set {
+                this["DefaultMusicDir"] = value;
+            }
+        }
     }
 }

@@ -2,6 +2,31 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <sys:String x:Key="MusicDirNotExist">That music directory doesn't exist. Please respecify.</sys:String>
+
+    <sys:String x:Key="ButtonPause">Pause</sys:String>
+    <sys:String x:Key="ButtonResume">Resume</sys:String>
+
+    <sys:String x:Key="RecordStartAdding">Start adding lyrics</sys:String>
+    <sys:String x:Key="RecordFileInUse">This file is currently in use. So skip it.</sys:String>
+    <sys:String x:Key="RecordAbnormalTag">The tag of this file seems to be abnormal. So skip it.</sys:String>
+    <sys:String x:Key="RecordClassicalMusic">This seems to be classical music. So skip it.</sys:String>
+    <sys:String x:Key="RecordAlreadyHasLyric">This song already has lyric. So skip it.</sys:String>
+    <sys:String x:Key="RecordCannotConnect">Cannot connect to lyric site. It seems the lyric site is down, or you don't have connection to the Internet.</sys:String>
+    <sys:String x:Key="RecordFound">Lyric found!</sys:String>
+    <sys:String x:Key="RecordNotFound">Cannot find lyric.</sys:String>
+    <sys:String x:Key="RecordManuallyStopped">Stopped by manual.</sys:String>
+    <sys:String x:Key="RecordFinished">Finished!</sys:String>
+    <sys:String x:Key="RecordToal">In total</sys:String>
+    <sys:String x:Key="RecordAmongTotal">songs are added with lyrics. Among them,</sys:String>
+    <sys:String x:Key="RecordSummaryAlready">of them already have lyrics,</sys:String>
+    <sys:String x:Key="RecordSummarySuccessful">of them have been added with lyrics.</sys:String>
+    <sys:String x:Key="RecordNoInfo">(Lack song info)</sys:String>
+    
+    <sys:String x:Key="StatusLabelReady">Ready</sys:String>
+    <sys:String x:Key="StatusLabelAdding">Adding lyrics...</sys:String>
+    <sys:String x:Key="StatusLabelPause">Paused</sys:String>
+
     <sys:String x:Key="Confirm">Yes</sys:String>
     <sys:String x:Key="Start">Start</sys:String>
 
@@ -9,5 +34,7 @@
     <sys:String x:Key="ConfirmExitCaption">Quit</sys:String>
 
     <sys:String x:Key="BrowserSongDirCaption">Browse Your Song Directory</sys:String>
+
+    <sys:String x:Key="AboutWindowCaption">About...</sys:String>
 
 </ResourceDictionary>

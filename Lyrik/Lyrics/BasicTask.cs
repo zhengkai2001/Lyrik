@@ -16,9 +16,17 @@ namespace Lyrik.Lyrics
             _mres = new ManualResetEventSlim(true);
         }
 
-        protected void TaskProceed()
+        protected bool TaskCanProceed()
         {
-            _mres.Wait(_cts.Token);
+            try
+            {
+                _mres.Wait(_cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void Pause()

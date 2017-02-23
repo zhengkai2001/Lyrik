@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Lyrik.Gui.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="关于..." Height="480" Width="425" ResizeMode="NoResize"
+        Title="{DynamicResource AboutWindowCaption}" Height="480" Width="425" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
@@ -20,11 +20,11 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" TextAlignment="Center" LineHeight="28" Padding="10">
                 <Run Foreground="Orange" FontSize="15" FontWeight="Bold">Lyrik</Run>
-                <Run Foreground="Goldenrod" FontSize="15">0.1.0</Run>
+                <Run Foreground="Goldenrod" FontSize="15">0.2.0</Run>
             </TextBlock>
             <TextBox Grid.Row="1" TextAlignment="Center" IsReadOnly="True" BorderThickness="0" Text="Copyright (c) 2015, zk (zkfake@qq.com)">
             </TextBox>
-            <Label Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">鸣谢：百度音乐 百度云</Label>
+            <!--<Label Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">鸣谢：百度音乐 百度云</Label>-->
             <!--<Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"></RowDefinition>
