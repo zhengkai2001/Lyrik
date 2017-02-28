@@ -47,7 +47,7 @@ namespace Lyrik.Lyrics
 
         public void Halt()
         {
-            _cts.Cancel();
+            _cts?.Cancel();
         }
 
         public void Dispose()
