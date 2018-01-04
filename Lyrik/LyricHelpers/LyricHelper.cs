@@ -2,7 +2,6 @@
 using Lyrik.Lyrics;
 using Lyrik.Utilities;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 
 namespace Lyrik.LyricHelpers
@@ -15,6 +14,8 @@ namespace Lyrik.LyricHelpers
         protected abstract Lyric GetLyric();
 
         private readonly HttpClient _http;
+
+        public bool NoConection { get; set; }
 
         protected LyricHelper()
         {
@@ -31,6 +32,7 @@ namespace Lyrik.LyricHelpers
             }
             catch (WebException)
             {
+                NoConection = true;
             }
             return "";
         }
@@ -67,18 +69,20 @@ namespace Lyrik.LyricHelpers
                 AddTitleToAttempts(requestAttempts, title, performer);
             }
 
-            //foreach (var request in requestAttempts)
-            //{
-            //    Lyric lyric = GetLyricFromSite(request);
-            //    if (lyric != null)
-            //    {
-            //        return lyric;
-            //    }
-            //}
+            NoConection = false;
+            foreach (var request in requestAttempts)
+            {
+                Lyric lyric = GetLyric(request);
+                if (NoConection || lyric != null)
+                {
+                    return lyric;
+                }
+            }
+            return null;
 
             // LINQ
             // 下面一行的作用等同于上面八行
-            return requestAttempts.Select(GetLyric).FirstOrDefault(lyric => lyric != null);
+            //return requestAttempts.Select(GetLyric).FirstOrDefault(lyric => lyric != null);
         }
     }
 }

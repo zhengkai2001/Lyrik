@@ -51,10 +51,7 @@ namespace Lyrik.Utilities
             FileStream stream = null;
             try
             {
-                if(file != null)
-                {
-                    stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                }
+                stream = file?.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             }
             catch (IOException)
             {

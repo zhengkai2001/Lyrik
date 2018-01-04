@@ -1,4 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics.CodeAnalysis;
+using System.Windows.Forms;
 
 namespace Lyrik.Gui
 {
@@ -8,47 +10,53 @@ namespace Lyrik.Gui
 
         private DirectoryBrowser() { }
 
+        [SuppressMessage("Microsoft.Reliability",
+            "CA2000:Dispose objects before losing scope",
+            Justification = "CA is wrong about this!")]
         public static string Browser(string initialDirectory, string caption)
         {
-            var result = "";
-
             //MessageBox.Show(os, "version", MessageBoxButton.OK, MessageBoxImage.Information);
 
             //if run on Windows XP
             if (OperatingSystem.Contains("5.1"))
             {
-                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                FolderBrowserDialog dialog1 = new FolderBrowserDialog();
                 try
                 {
-                    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        {
-                            result = dialog.SelectedPath;
-                        }
-                    }
+                    return dialog1.ShowDialog() == DialogResult.OK ? dialog1.SelectedPath : initialDirectory;
                 }
                 finally
                 {
-                    dialog.Dispose();
+                    dialog1?.Dispose();
                 }
             }
             else
             {
-                var dialog = new OpenDirectoryDialog(initialDirectory, caption);
+                CommonOpenFileDialog dialog2 = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = true,
+                    InitialDirectory = initialDirectory,
+                    Title = caption,
+
+                    AddToMostRecentlyUsedList = false,
+                    AllowNonFileSystemItems = false,
+                    EnsureFileExists = true,
+                    EnsurePathExists = true,
+                    EnsureReadOnly = false,
+                    EnsureValidNames = true,
+                    Multiselect = false,
+                    ShowPlacesList = true
+                };
+
                 try
                 {
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        result = dialog.DirName;
-                    }
+                    return dialog2.ShowDialog() == CommonFileDialogResult.Ok ? dialog2.FileName : initialDirectory;
                 }
                 finally
                 {
-                    dialog.Dispose();
+                    dialog2?.Dispose();
                 }
             }
-
-            return result;
         }
     }
 }

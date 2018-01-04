@@ -1,4 +1,5 @@
 ﻿using Lyrik.Utilities;
+using System;
 using System.Linq;
 
 namespace Lyrik.Lyrics
@@ -25,8 +26,8 @@ namespace Lyrik.Lyrics
 
         public static Lyric GetLyricFromLrc(string lrcString)
         {
-            var seperators = new[] { '\n' };
-            var lines = lrcString.Split(seperators);
+            var seperators = new[] { "\n", "<br>" };
+            var lines = lrcString.Split(seperators, StringSplitOptions.None);
 
             //var lyric = "";
             //foreach (var line in lines)

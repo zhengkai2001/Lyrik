@@ -38,9 +38,9 @@
 
             <Grid DockPanel.Dock="Top" Margin="0, 3, 0, 3">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Margin="0, 0, 3, 0" Name="StartButton" Click="AddLyric">开始</Button>
                 <Button Grid.Column="1" Margin="3, 0, 3, 0" Name="PauseResumeButton"></Button>

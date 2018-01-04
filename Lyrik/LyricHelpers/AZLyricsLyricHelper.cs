@@ -27,10 +27,20 @@ namespace Lyrik.LyricHelpers
 
                 var lyricSearchResultPage = GetHtmlString(RequestUrl);
                 doc.LoadHtml(lyricSearchResultPage);
-                var songNode = doc.DocumentNode.SelectSingleNode("//td[@class='text-left visitedlyr']/a");
-                var lrcAddress = songNode.GetAttributeValue("href", "");
 
-                var lyricPage = GetHtmlString(lrcAddress);
+                var songNode = doc.DocumentNode.SelectSingleNode("//td[@class='text-left visitedlyr']/a");
+                if (songNode == null)
+                {
+                    return null;
+                }
+
+                var lyricUrl = songNode.GetAttributeValue("href", "");
+                var lyricPage = GetHtmlString(lyricUrl);
+                if (String.IsNullOrEmpty(lyricPage))
+                {
+                    return null;
+                }
+
                 doc.LoadHtml(lyricPage);
                 var brNodes = doc.DocumentNode.SelectNodes("//br");
                 var lyricDivNode = brNodes[1].NextSibling.NextSibling;
@@ -44,10 +54,8 @@ namespace Lyrik.LyricHelpers
             }
             catch (NullReferenceException)
             {
-                //若解析html失败
+                return null;
             }
-
-            return null;
         }
     }
 }

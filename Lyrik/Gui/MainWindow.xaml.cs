@@ -99,7 +99,7 @@ namespace Lyrik.Gui
             App.SetCulture(culture);
         }
 
-        private void BrowserSongDir(object sender, EventArgs e)
+        private void BrowserSongDir(object sender, RoutedEventArgs e)
         {
             var browserSongDirCaption = App.GetLocalizedString("BrowserSongDirCaption");
             var result = DirectoryBrowser.Browser(MusicDirTextBox.Text, browserSongDirCaption);
